@@ -1,0 +1,42 @@
+services:
+  web:
+    build: .
+    container_name: ExpenseTracker
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles # Mount static files
+      - media_volume:/app/media # Mount media files
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    command:
+      ["gunicorn", "--bind", "0.0.0.0:8000", "ExpenseTracker.wsgi:application"]
+    networks:
+      - expense_network
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    networks:
+      - expense_network
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3307:3306" # Expose MySQL port
+
+networks:
+  expense_network:
+
+volumes:
+  mysql_data:
+  static_volume: # Persistent volume for static files
+  media_volume: # Persistent volume for media files
