@@ -34,24 +34,22 @@ class RegisterView(APIView):
                 
             )
             print("below the print function ")
-            return Response({'message': 'User registered. Please verify your otp.'}, status=status.HTTP_100_CONTINUE)
+            return Response({'message': 'User registered. Please verify your otp.'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(APIView):
     def post(self, request):
-        serializer = LoginSerializer(data = request.POST, context = {'request' : request})
+        serializer = LoginSerializer(data=request.data, context={'request': request})
 
         if serializer.is_valid():
             validated_data = serializer.validated_data
-            # user = User.objects.get(email = validated_data['email'])
-            login_message = "User login successfully" 
+            login_message = "User logged in successfully"
 
-            response_data =  {"message" : login_message, **validated_data}
-            return Response(response_data, status = status.HTTP_200_OK)
-        
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+            response_data = {"message": login_message, **validated_data}
+            return Response(response_data, status=status.HTTP_200_OK)
 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class VerifyOTPView(APIView):
     def post(self,request):

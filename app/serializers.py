@@ -36,34 +36,42 @@ class RegisterSerializer(serializers.ModelSerializer):
 """ User Login """
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    password = serializers.CharField(write_only = True)
-    username = serializers.CharField(max_length =255, read_only = True)
-    access_token = serializers.CharField(max_length = 255, read_only = True)
-    refresh_token = serializers.CharField(max_length =255, read_only = True)
-    
+    password = serializers.CharField(write_only=True)
+    username = serializers.CharField(max_length=255, read_only=True)
+    access_token = serializers.CharField(max_length=255, read_only=True)
+    refresh_token = serializers.CharField(max_length=255, read_only=True)
 
-
-    def validate(self , attrs):
+    def validate(self, attrs):
         email = attrs.get('email')
         password = attrs.get('password')
-        request = self.context.get(request)
+        request = self.context.get('request')
 
-        user = authenticate(request, email = email, password = password)
-        
+        # Try fetching user by email
+        user = User.objects.filter(email=email).first()
+        if not user:
+            raise AuthenticationFailed('No account found with this email.')
+
+        # Authenticate user (username is used internally)
+        user = authenticate(request, username=user.username, password=password)
+
         if not user:
             raise AuthenticationFailed('Invalid credentials, try again.')
+
         if not user.is_verified:
-            raise AuthenticationFailed('User is not verified, please verify your email.')
-        
+            raise AuthenticationFailed('User is not verified. Please verify your email.')
+
+        if not user.is_active:
+            raise AuthenticationFailed('This account is inactive. Contact support.')
+
+        # Generate tokens
         tokens = user.tokens()
 
         return {
-            'email' : user.email,
+            'email': user.email,
             'username': user.username,
             'access_token': str(tokens.get('access')),
-           'refresh_token': str(tokens.get('refresh')),
+            'refresh_token': str(tokens.get('refresh')),
         }
-
 
 class OTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
