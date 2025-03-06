@@ -3,12 +3,13 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 from datetime import timedelta
-
+from django.db.models import Sum
 AUTH_PROVIDERS = {
     'email': 'email'
 }
 
 # Custom Manager for User
+
 class UserManager(BaseUserManager):
 
     def create_user(self, username, email, password=None, **extra_fields):
@@ -134,3 +135,51 @@ class PasswordResetToken(models.Model):
 
     def __str__(self):
         return f"PasswordResetToken(user = {self.user}, token = {self.token})"
+
+
+# Expense Tracker model to handle expense tracking functionality
+
+class Category(models.Model):
+    """ Expense and Income Categories """
+    name = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.name
+    
+class Expense(models.Model):
+    """ Model to store expenses and income """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="expenses")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField(auto_now_add=True)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    add_expense_type = models.CharField(max_length=10, choices=[
+        ("Expense", "Expense"),
+        ("Income", "Income")
+    ], default="Expense")
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.category.name} - {self.amount}"    
+
+class ExpenseTracker(models.Model):
+    """ Model to track total income and expenses per user """
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="tracker")
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_expenses = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_income = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def update_totals(self):
+        """ Update total income, expenses, and balance automatically """
+        self.total_income = Expense.objects.filter(
+            user=self.user, add_expense_type="Income"
+        ).aggregate(total=Sum('amount'))['total'] or 0  # Correct key
+        
+        self.total_expenses = Expense.objects.filter(
+            user=self.user, add_expense_type="Expense"
+        ).aggregate(total=Sum('amount'))['total'] or 0  # Correct key
+
+        self.total_amount = self.total_income - self.total_expenses
+        self.save()
+        
+    def __str__(self):
+        return f"{self.user.username} - Balance : {self.total_amount}"

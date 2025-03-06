@@ -1,19 +1,23 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import User, OTP, OTPRequestTracker
-
+from .models import User, OTP, OTPRequestTracker, Expense, ExpenseTracker, Category
+import pandas as pd
+from datetime import datetime
 from .serializers import (
     RegisterSerializer, LoginSerializer, OTPSerializer,
     PasswordResetRequestSerializer, PasswordResetConfirmSerializer,
-    VerifyOTPSerializer
+    LogoutSerializer,
+    VerifyOTPSerializer, ExpenseSerializer, ExpenseTrackerSerializer, CategorySerializer, 
 )
+
+from django.http import HttpResponse
 from .utils import generate_otp, send_email
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.urls import reverse
-# from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 
 
 
@@ -88,6 +92,17 @@ class VerifyOTPView(APIView):
 
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
+
+class LogoutAPIView(APIView):
+    serializer_class = LogoutSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class ResendOTPView(APIView):
     def post(self, request):
@@ -176,3 +191,140 @@ class PasswordResetConfirmationView(APIView):
             serializer.save()
             return Response({'message' : 'Password reset successful.'}, status = status.HTTP_200_OK)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
+""" Category Service """
+class CategoryAPIView(APIView):
+    """ API to manage categories """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """ Retrieve all categories """
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        """ Create a new category """
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, pk):
+        """ Update an existing category """
+        try:
+            category = Category.objects.get(id=pk)
+        except Category.DoesNotExist:
+            return Response({'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = CategorySerializer(category, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk):
+        """ Delete an existing category """
+        try:
+            category = Category.objects.get(id=pk)
+        except Category.DoesNotExist:
+            return Response({'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        category.delete()
+        return Response({'message': 'Category deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+
+""" Expenses Services """
+class ExpenseAPIView(APIView):
+    """ API to manage user expenses."""
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        """ Retrieve all expenses for the logged-in user. """
+        expenses = Expense.objects.filter(user=request.user)
+        serializer = ExpenseSerializer(expenses, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        """ Add a new Expense or Income."""
+        data = request.data.copy()
+        data['user'] = request.user.id  # Ensure user is assigned.
+        
+        serializer = ExpenseSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            
+            """ Update the expense tracker """
+            tracker, created = ExpenseTracker.objects.get_or_create(user=request.user)
+            tracker.update_totals()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+""" Expense Detail Service """
+class ExpenseDetailAPIView(APIView):
+    """ API to update or delete an expense """
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        """ Update an existing expense """
+        try:
+            expense = Expense.objects.get(id=pk, user=request.user)
+        except Expense.DoesNotExist:
+            return Response({"error": "Expense not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ExpenseSerializer(expense, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            # Update the tracker after modification
+            tracker = ExpenseTracker.objects.get(user=request.user)
+            tracker.update_totals()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        """ Delete an expense """
+        try:
+            expense = Expense.objects.get(id=pk, user=request.user)
+            expense.delete()
+            # Update the tracker after deletion
+            tracker = ExpenseTracker.objects.get(user=request.user)
+            tracker.update_totals()
+            return Response({"message": "Expense deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except Expense.DoesNotExist:
+            return Response({"error": "Expense not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+""" Expense Report Service """
+class ExpenseReportAPIView(APIView):
+    """ API to generate monthly or yearly reports in Excel """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """ Generate an expense report for a specific month or year """
+        report_type = request.query_params.get('type', 'monthly')  # 'monthly' or 'yearly'
+        year = int(request.query_params.get('year', datetime.now().year)) # type: ignore
+        month = int(request.query_params.get('month', datetime.now().month)) # type: ignore
+
+        expenses = Expense.objects.filter(user=request.user)
+        if report_type == "monthly":
+            expenses = expenses.filter(date__year=year, date__month=month)
+        elif report_type == "yearly":
+            expenses = expenses.filter(date__year=year)
+
+        data = [{
+            "Category": exp.category.name,
+            "Amount": exp.amount,
+            "Date": exp.date.strftime("%Y-%m-%d"),
+            "Type": exp.add_expense_type,
+            "Description": exp.description
+        } for exp in expenses]
+
+        # Create DataFrame and generate Excel
+        df = pd.DataFrame(data)
+        response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") # type: ignore
+        response["Content-Disposition"] = f'attachment; filename="Expense_Report_{year}.xlsx"'
+        df.to_excel(response, index=False)
+        return response
