@@ -1,51 +1,34 @@
 import { useState } from "react";
-import { axios } from "axios";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import BASE_URL from "../../utils/urls";
 import { toast } from "react-toastify";
+
 const useRegister = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const [registerData, setRegisterData] = useState({
-    email: "",
-    username: "",
-    password: "",
-    password2: "",
-  });
-
-  const [error, setError] = useState(" ");
-
-  const handleOnChange = (e) => {
-    setRegisterData({ ...registerData, [e.target.name]: e.target.value });
-  };
-
-  const handleOnSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleOnSubmit = async (formData) => {
     try {
       setLoading(true);
-      const response = await axios.post(
-        `${BASE_URL}/register/`,registerData
-      );
-      if(response.status == 201){
-        navigate("/verify-email");
-        toast.success("Registration successful, Please verify your email");
+      console.log("API Request Data:", formData); // ✅ Debugging
+
+      const response = await axios.post("http://localhost:8000/api/register/", formData);
+      if (response.status === 201) {
+        toast.success("Registration Successful! Please verify your email.");
+        navigate("/verify-otp");
       }
+    } catch (err) {
+      console.error("API Error:", err.response?.data || err.message);
+      setError(err.response?.data || "Something went wrong");
+      toast.error("Registration Failed");
+    } finally {
+      setLoading(false);
     }
-    catch (error) {
-      if(error.response){
-        setError(error.response.data.message);
-        setLoading(false);
-      }
-    }
-    
   };
 
   return {
-    handleOnChange,
     handleOnSubmit,
-    registerData,
     loading,
     error,
   };

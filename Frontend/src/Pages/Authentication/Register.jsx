@@ -1,26 +1,24 @@
-import { useState } from "react";
-import { Form } from "antd"; // Correct import
+import { Form } from "antd";
 import {
   MailOutlined,
   UserOutlined,
   LockOutlined,
   UserAddOutlined,
 } from "@ant-design/icons";
-import { CustomButton, InputField } from "../../components/index"
+import { CustomButton, InputField } from "../../components/index";
 import { Link } from "react-router-dom";
+import useRegister from "../../hooks/Authentication/useRegister";
 import "./style.css";
 
 const Register = () => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
+  const { handleOnSubmit, loading } = useRegister();
 
-  // Handle form submission
+  console.log("Component Rendered");
+
   const onFinish = (values) => {
-    console.log("Form Values:", values);
-    setLoading(true);
-
-    // Simulate an API call
-    setTimeout(() => setLoading(false), 2000);
+    console.log("Form Submitted Data:", values); // ✅ Debugging
+    handleOnSubmit(values); // API call with form values
   };
 
   return (
@@ -38,59 +36,57 @@ const Register = () => {
       >
         <InputField
           name="username"
-          label="Enter Username"
-          placeholder="Username"
+          label="Username"
+          placeholder="Enter Username"
           prefixIcon={<UserOutlined />}
-          rules={[
-            {
-              required: true,
-              message: "Please enter your username",
-            },
-          ]}
+          rules={[{ required: true, message: "Please enter your username" }]}
         />
+
         <InputField
           name="email"
-          label="Enter Email"
-          placeholder="Enter your email"
+          label="Email"
+          placeholder="Enter Email"
           prefixIcon={<MailOutlined />}
           rules={[
-            {
-              required: true,
-              message: "Please enter your email",
-            },
+            { required: true, message: "Please enter your email" },
+            { type: "email", message: "Invalid email format" },
           ]}
         />
+
         <InputField
           name="password"
-          label="Enter Password"
-          placeholder="Password"
+          label="Password"
+          placeholder="Enter Password"
           prefixIcon={<LockOutlined />}
           type="password"
-          rules={[
-            {
-              required: true,
-              message: "Please enter your password",
-            },
-          ]}
+          rules={[{ required: true, message: "Please enter your password" }]}
         />
+
         <InputField
           name="password2"
           label="Confirm Password"
           placeholder="Confirm Password"
-          type="password"
           prefixIcon={<LockOutlined />}
+          type="password"
+          dependencies={["password"]}
           rules={[
-            {
-              required: true,
-              message: "Please confirm your password",
-            },
+            { required: true, message: "Please confirm your password" },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || getFieldValue("password") === value) {
+                  return Promise.resolve();
+                }
+                return Promise.reject("Passwords do not match!");
+              },
+            }),
           ]}
         />
+
         <div className="reg-log-footer">
           <p>
             Already have an account?{" "}
             <Link className="linked" to="/login">
-              Login here.
+              Login here
             </Link>
           </p>
         </div>
@@ -102,7 +98,7 @@ const Register = () => {
             loading={loading}
             htmlType="submit"
           >
-            {loading ? "Registering..." : "Register"}
+            Register
           </CustomButton>
         </div>
       </Form>

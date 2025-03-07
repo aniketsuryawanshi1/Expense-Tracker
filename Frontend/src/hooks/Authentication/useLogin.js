@@ -1,79 +1,63 @@
-import { useState } from 'react';
-import AxiosInstance from '../../utils/api-handler';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import AxiosInstance from "../../utils/api-handler";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const useLogin = () => {
+  const navigate = useNavigate(); // Navigation hook
+  const [loading, setLoading] = useState(false);
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
 
-    const navigate  =useNavigate(); // use for navigation after getting success api call.
-    const [loading, setLoading] = useState(false); // use for loading state.
-    const [loginData, setLoginData] = useState({ // use for login data.
-        email: "",
-        password: "",
-    });
+  // Function to handle input changes
+  const handleChange = (e) => {
+    setLoginData({ ...loginData, [e.target.name]: e.target.value });
+  };
 
-    // function for set login data.
-    const handleSubmit = (e) => {
-        // set login data to state.
-        setLoginData({ ...loginData, [e.target.name]: e.target.value});
-    };
+  // Handle form submission
+  const handleOnSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-    // function for handle login form submit.
-    const handleOnSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true); // set loading state to true.
+    try {
+      const response = await AxiosInstance.post("login/", loginData);
 
-        try {
-            
-            // make api call to login user.
-            const response = await AxiosInstance.post('login/',loginData);
+      if (response.status === 200) {
+        const responseData = response.data;
 
-            // if api call success.
-            if(response.status === 200){
-                const responseData = response.data;
+        const user = {
+          username: responseData.username,
+          email: responseData.email,
+        };
 
-                const user = {
-                    username : responseData.username,
-                    email : responseData.email,
+        // Store tokens & user data
+        localStorage.setItem("token", responseData.access_token);
+        localStorage.setItem("refresh_token", responseData.refresh_token);
+        localStorage.setItem("user", JSON.stringify(user));
 
-                };
-
-                // set user data to local storage.
-                localStorage.setItem("token", JSON.stringify(responseData.access_token));
-
-                // set refresh token to local storage.
-                localStorage.setItem("refresh_token", JSON.stringify(responseData.refresh_token));
-
-                // set user data to local storage.
-                localStorage.setItem("user", JSON.stringify(user));
-
-                // navigate to dashboard after login.
-                navigate("/dashboard");
-
-                toast.success("Login Successful"); // show success message.
-
-            } else{
-                toast.error("Something went wrong, Login Failed..!"); // show error message.
-            }
-
-
-        } catch (error) {
-            
-            // Show error with message.
-            toast.error("Something went wrong, Login Failed..!",error.response || error.message);
-            console.error("Login Failed:", error.response || error.message);
-        } finally{
-            setLoading(false); // set loading state to false
-        }
+        navigate("/dashboard");
+        toast.success("Login Successful");
+      } else {
+        toast.error("Login failed! Please try again.");
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Something went wrong, Login Failed..!";
+      toast.error(errorMessage);
+      console.error("Login Failed:", errorMessage);
+    } finally {
+      setLoading(false);
     }
+  };
 
-return{
+  return {
     loginData,
-    handleSubmit,
+    handleChange,
     handleOnSubmit,
     loading,
-};
-
+  };
 };
 
 export default useLogin;

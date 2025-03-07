@@ -1,21 +1,13 @@
-import { useState } from "react";
 import { Form } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { CustomButton, InputField } from "../../components/index";
 import { Link } from "react-router-dom";
+import useLogin from "../../hooks/Authentication/useLogin"; // Import the hook
 import "./style.css";
+
 const Login = () => {
+  const { loginData, handleChange, handleOnSubmit, loading } = useLogin();
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-
-  // Handle form submission
-  const onFinish = (values) => {
-    console.log("Form Values:", values);
-    setLoading(true);
-
-    // Simulate an API call
-    setTimeout(() => setLoading(false), 2000);
-  };
 
   return (
     <div className="reg-log-container">
@@ -26,7 +18,7 @@ const Login = () => {
       <Form
         form={form}
         layout="vertical"
-        onFinish={onFinish}
+        onFinish={handleOnSubmit} // Use the custom hook function
         className="reg-log-form"
       >
         <InputField
@@ -35,6 +27,8 @@ const Login = () => {
           placeholder="Email"
           type="email"
           prefixIcon={<MailOutlined />}
+          value={loginData.email}
+          onChange={handleChange} // Use handleChange
           rules={[
             {
               required: true,
@@ -48,6 +42,8 @@ const Login = () => {
           placeholder="Password"
           type="password"
           prefixIcon={<LockOutlined />}
+          value={loginData.password}
+          onChange={handleChange} // Use handleChange
           rules={[
             {
               required: true,

@@ -3,7 +3,7 @@ import { Card, Input, Form, Typography, Button, message } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import BASE_URL from "../../utils/urls";
+
 import "../../components/style.css";
 const { Title, Text } = Typography;
 
@@ -54,13 +54,12 @@ const OTPVerification = () => {
     }
   }, [otp]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     const finalOtp = otp.join("");
     try {
       setLoading(true);
       const response = await axios.post(
-        `${BASE_URL}/verify-email/`,
+        "http://localhost:8000/api/verify-otp/",
         { otp: finalOtp }
       );
       if (response.status === 200) {
@@ -73,7 +72,7 @@ const OTPVerification = () => {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="otp-container">
       <Card hoverable className="otp-card">

@@ -78,7 +78,7 @@ class LoginSerializer(serializers.Serializer):
 """ User Logout """
 
 class LogoutSerializer(serializers.Serializer):
-    refresh_token = serializers.charField()
+    refresh_token = serializers.CharField()
     
     default_error_messages = {
         'bad_token': ('Token is expired or invalid')

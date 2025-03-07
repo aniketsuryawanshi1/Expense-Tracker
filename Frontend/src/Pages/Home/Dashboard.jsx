@@ -7,7 +7,15 @@ const Dashboard = () => {
 
     const navigate = useNavigate();
 
-    
+    // Get user data from local storage and check if it exists. If not, redirect to login page.
+    const data = JSON.parse(localStorage.getItem("user"));
+
+    // If user data does not exist, redirect to login page.
+    if (!data) {
+        navigate("/");
+        return null;
+    }
+
     // Logout user function using axios instance.
     const handleLogout = async () => {
         const refresh = JSON.parse(localStorage.getItem("refresh_token"));
@@ -40,9 +48,8 @@ const Dashboard = () => {
                 }
             }>
                 <h3>
-                    Welcome : user.username
-
-                    Email : user.email
+                    Welcome : {data.username}
+                    Email : {data.email}
 
                 </h3>
             </div>
