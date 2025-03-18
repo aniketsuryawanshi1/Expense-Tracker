@@ -2,17 +2,12 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
 
-const BASE_URL = "http://127.0.0.1:8000/api/";
+const BASE_URL = "http://localhost:8000/api/";
 
 const getTokenFromStorage = (key) => {
   const storedToken = localStorage.getItem(key);
   if (storedToken && storedToken !== "undefined") {
-    try {
-      return JSON.parse(storedToken);
-    } catch (error) {
-      console.error("Failed to parse token from storage:", error);
-      return "";
-    }
+    return storedToken;
   }
   return "";
 };
@@ -28,44 +23,49 @@ const AxiosInstance = axios.create({
   },
 });
 
+// Request Interceptor
 AxiosInstance.interceptors.request.use(
   async (req) => {
-    console.log("Request intercepted:", req);
-
     if (accessToken) {
-      const user = jwtDecode(accessToken);
-      const isExpired = dayjs.unix(user.exp).diff(dayjs()) < 1;
-
-      if (!isExpired) {
-        req.headers.Authorization = `Bearer ${accessToken}`;
-        return req;
-      }
-
       try {
+        const user = jwtDecode(accessToken);
+        const isExpired = dayjs.unix(user.exp).diff(dayjs()) < 1;
+
+        if (!isExpired) {
+          req.headers.Authorization = `Bearer ${accessToken}`;
+          return req;
+        }
+
         console.log("Access token expired, attempting to refresh...");
+
+        if (!refreshToken) {
+          console.error("No refresh token available, redirecting to login.");
+          localStorage.removeItem("token");
+          localStorage.removeItem("refresh_token");
+          window.location.href = "/login";
+          return Promise.reject("No refresh token");
+        }
+
         const response = await axios.post(`${BASE_URL}token/refresh/`, {
           refresh: refreshToken,
         });
 
         if (response.data.access) {
           const newAccessToken = response.data.access;
-          localStorage.setItem("token", JSON.stringify(newAccessToken));
+          localStorage.setItem("token", newAccessToken);
           req.headers.Authorization = `Bearer ${newAccessToken}`;
           accessToken = newAccessToken;
           console.log("Token refreshed successfully");
           return req;
-        } else {
-          throw new Error("Invalid refresh response structure");
         }
       } catch (error) {
-        console.error("Token refresh failed:", error.response || error.message);
+        console.error("Token refresh failed:", error.response?.data || error.message);
         localStorage.removeItem("token");
         localStorage.removeItem("refresh_token");
         window.location.href = "/login";
         return Promise.reject(error);
       }
     }
-
     return req;
   },
   (error) => {
@@ -74,7 +74,7 @@ AxiosInstance.interceptors.request.use(
   }
 );
 
-// Interceptor to handle responses
+// Response Interceptor
 AxiosInstance.interceptors.response.use(
   (response) => {
     console.log("Response received:", response);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import AxiosInstance from "../../utils/api-handler";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -8,20 +8,23 @@ const useRegister = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleOnSubmit = async (formData) => {
+  const handleOnSubmit = async (formData, resetForm) => {
     try {
       setLoading(true);
       console.log("API Request Data:", formData); // ✅ Debugging
 
-      const response = await axios.post("http://localhost:8000/api/register/", formData);
+      const response = await AxiosInstance.post("/register/", formData);
+      console.log("API Endpoint Path:", response.config.url); // ✅ Debugging
+
       if (response.status === 201) {
         toast.success("Registration Successful! Please verify your email.");
-        navigate("/verify-otp");
+        resetForm(); // Reset form on success
+        navigate("/verify-email");
       }
     } catch (err) {
       console.error("API Error:", err.response?.data || err.message);
-      setError(err.response?.data || "Something went wrong");
-      toast.error("Registration Failed");
+      setError(err.response?.data?.message || "Something went wrong");
+      toast.error(err.response?.data?.message || "Registration Failed");
     } finally {
       setLoading(false);
     }

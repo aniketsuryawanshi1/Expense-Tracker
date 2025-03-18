@@ -1,14 +1,17 @@
-import { Form } from "antd";
+import { Form,Button } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
-import { CustomButton, InputField } from "../../components/index";
+import {  InputField } from "../../components/index";
 import { Link } from "react-router-dom";
 import useLogin from "../../hooks/Authentication/useLogin"; // Import the hook
 import "./style.css";
 
 const Login = () => {
-  const { loginData, handleChange, handleOnSubmit, loading } = useLogin();
+  const { handleOnSubmit, loading } = useLogin();
   const [form] = Form.useForm();
-
+const onFinish = (values) => {
+  console.log("Form Submitted Data : ", values);
+  handleOnSubmit(values, () => form.resetFields());
+};
   return (
     <div className="reg-log-container">
       <h1 className="reg-log-title">
@@ -18,7 +21,7 @@ const Login = () => {
       <Form
         form={form}
         layout="vertical"
-        onFinish={handleOnSubmit} // Use the custom hook function
+        onFinish={onFinish} // Use the custom hook function
         className="reg-log-form"
       >
         <InputField
@@ -27,8 +30,6 @@ const Login = () => {
           placeholder="Email"
           type="email"
           prefixIcon={<MailOutlined />}
-          value={loginData.email}
-          onChange={handleChange} // Use handleChange
           rules={[
             {
               required: true,
@@ -42,8 +43,6 @@ const Login = () => {
           placeholder="Password"
           type="password"
           prefixIcon={<LockOutlined />}
-          value={loginData.password}
-          onChange={handleChange} // Use handleChange
           rules={[
             {
               required: true,
@@ -60,14 +59,19 @@ const Login = () => {
           </p>
         </div>
         <div className="center-button">
-          <CustomButton
-            className="custom-button"
-            size="large"
+        <Button
+            type="primary"
             htmlType="submit"
+            style={{ marginTop: "20px",
+              width: "100%",
+              maxWidth: "300px",
+              padding: "20px",
+            }}
             loading={loading}
+            className="custom-button"
           >
-            {loading ? "Logging in..." : "Login"}
-          </CustomButton>
+            {loading ? "Loginging..." : "Login"}
+          </Button>
         </div>
       </Form>
     </div>

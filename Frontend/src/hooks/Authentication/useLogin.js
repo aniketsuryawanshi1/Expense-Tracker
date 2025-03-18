@@ -6,25 +6,19 @@ import { useNavigate } from "react-router-dom";
 const useLogin = () => {
   const navigate = useNavigate(); // Navigation hook
   const [loading, setLoading] = useState(false);
-  const [loginData, setLoginData] = useState({
-    email: "",
-    password: "",
-  });
+  const [error, setError] = useState("");
 
-  // Function to handle input changes
-  const handleChange = (e) => {
-    setLoginData({ ...loginData, [e.target.name]: e.target.value });
-  };
+
 
   // Handle form submission
-  const handleOnSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const handleOnSubmit = async (formData, resetForm) => {
     try {
-      const response = await AxiosInstance.post("login/", loginData);
-
+      setLoading(true);
+      console.log("API Request Data:", formData); // ✅ Debugging
+      const response = await AxiosInstance.post("login/", formData);
+      console.log("after login api call.")
       if (response.status === 200) {
+        
         const responseData = response.data;
 
         const user = {
@@ -37,26 +31,26 @@ const useLogin = () => {
         localStorage.setItem("refresh_token", responseData.refresh_token);
         localStorage.setItem("user", JSON.stringify(user));
 
+        toast.success("You have successfully logged in.")
+        resetForm();
         navigate("/dashboard");
-        toast.success("Login Successful");
-      } else {
-        toast.error("Login failed! Please try again.");
-      }
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Something went wrong, Login Failed..!";
-      toast.error(errorMessage);
-      console.error("Login Failed:", errorMessage);
+
+        
+      } 
+    } catch (err) {
+      console.error("API Error : ", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Something went wrong");
+      toast.error(err.response?.data?.message || "Login Failed.");
     } finally {
       setLoading(false);
     }
   };
 
   return {
-    loginData,
-    handleChange,
+
     handleOnSubmit,
     loading,
+    error,
   };
 };
 

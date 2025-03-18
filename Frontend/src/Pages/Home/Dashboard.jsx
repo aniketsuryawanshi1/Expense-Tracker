@@ -18,11 +18,12 @@ const Dashboard = () => {
 
     // Logout user function using axios instance.
     const handleLogout = async () => {
-        const refresh = JSON.parse(localStorage.getItem("refresh_token"));
+        const refresh = localStorage.getItem("refresh_token");
         const res = await AxiosInstance.post("logout/", {
           refresh_token: refresh,
         });
         if (res.status === 204) {
+            console.log("User logged out");
           localStorage.clear();
           navigate("/");
           toast.warn("Logout successful");

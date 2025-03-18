@@ -101,7 +101,7 @@ class LogoutAPIView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
+            return Response({'message': 'User logged out successfully'}, status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class ResendOTPView(APIView):
