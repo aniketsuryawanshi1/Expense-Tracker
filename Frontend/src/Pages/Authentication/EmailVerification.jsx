@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Card, Input, Form, Typography, message } from "antd";
+import { Card, Input, Form, Typography, message, Button } from "antd";
 import { MailOutlined, LoadingOutlined, CheckOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
 import { CustomButton } from "../../components/index";
 import axios from "axios";
 
@@ -11,7 +11,12 @@ const { Title, Text } = Typography;
 const OTPVerification = () => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(60); // Update timer to 60 seconds
+  const [canResend, setCanResend] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation(); // Get the current location
+
+  const isPasswordReset = location.pathname.includes("password-reset"); // Check if it's for password reset
 
   const handleChange = (value, index) => {
     if (/^\d$/.test(value) || value === "") {
@@ -54,17 +59,26 @@ const OTPVerification = () => {
     }
   }, [otp]);
 
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setCanResend(true);
+    }
+  }, [timeLeft]);
+
   const handleSubmit = async () => {
     const finalOtp = otp.join("");
     try {
       setLoading(true);
-      const response = await axios.post(
-        "http://localhost:8000/api/verify-otp/",
-        { otp: finalOtp }
-      );
+      const endpoint = isPasswordReset
+        ? "http://localhost:8000/api/password-reset/"
+        : "http://localhost:8000/api/verify-otp/";
+      const response = await axios.post(endpoint, { otp: finalOtp });
       if (response.status === 200) {
-        message.success("Email verified, Please login");
-        navigate("/login");
+        message.success(isPasswordReset ? "OTP verified, Please reset your password" : "Email verified, Please login");
+        navigate(isPasswordReset ? "/reset-password" : "/login");
       }
     } catch (err) {
       message.error(err.response?.data?.message || "Verification Failed");
@@ -73,13 +87,17 @@ const OTPVerification = () => {
     }
   };
 
+  const handleResendOtp = () => {
+    navigate("/resend-otp"); // Ensure this path matches the route for RequestAction component
+  };
+
   return (
     <div className="otp-container">
       <Card hoverable className="otp-card">
         <MailOutlined className="otp-icon" />
-        <Title level={3}>Email Verification</Title>
+        <Title level={3}>{isPasswordReset ? "Password Reset" : "Email Verification"}</Title>
         <Text style={{ marginBottom: "20px", display: "block" }}>
-          Please enter the OTP sent to your email
+          {isPasswordReset ? "Please enter the OTP sent to your email to reset your password" : "Please enter the OTP sent to your email"}
         </Text>
 
         <Form onFinish={handleSubmit}>
@@ -107,13 +125,25 @@ const OTPVerification = () => {
             htmlType="submit"
             loading={loading}
             className="custom-button"
-            // add some custom style
             style={{ marginTop: "20px", width: "100%", maxWidth: "300px"}}
             icon={loading ? <LoadingOutlined /> : <CheckOutlined />}
           >
             {loading ? "Verifying..." : "Verify"}
           </CustomButton>
         </Form>
+        <Text style={{ marginTop: "20px", display: "block" }}>
+          {timeLeft > 0 ? `OTP expires in ${timeLeft} seconds` : "OTP expired"}
+        </Text>
+        {canResend && (
+          <Button
+            type="link"
+            onClick={handleResendOtp}
+            disabled={loading}
+            style={{ marginTop: "10px" }}
+          >
+            Resend OTP
+          </Button>
+        )}
       </Card>
     </div>
   );

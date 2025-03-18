@@ -2,4 +2,6 @@ import Register from "./Authentication/Register"
 import Login from "./Authentication/Login";
 import EmailVerification from "./Authentication/EmailVerification";
 import Dashboard from "./Home/Dashboard";
-export { Register, Login, EmailVerification, Dashboard };
+import RequestAction from "./Authentication/RequestAction";
+import SetNewPassword from "./Authentication/SetNewPassword";
+export { Register, Login, EmailVerification, Dashboard, RequestAction , SetNewPassword};

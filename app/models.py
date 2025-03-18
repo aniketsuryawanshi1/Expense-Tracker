@@ -94,7 +94,7 @@ class OTP(models.Model):
 
     # Check if OTP has expired
     def is_expired(self):
-        OTP_EXPIRY_TIME = timedelta(seconds=150)  # Expiry time for OTP
+        OTP_EXPIRY_TIME = timedelta(seconds=60)  # Expiry time for OTP
         return timezone.now() > self.created_at + OTP_EXPIRY_TIME
 
     def __str__(self):

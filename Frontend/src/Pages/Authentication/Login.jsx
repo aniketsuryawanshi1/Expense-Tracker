@@ -1,17 +1,22 @@
 import { Form } from "antd";
 import { MailOutlined, LockOutlined, LoadingOutlined, LoginOutlined } from "@ant-design/icons";
 import { InputField, CustomButton } from "../../components/index";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import useLogin from "../../hooks/Authentication/useLogin"; // Import the hook
 import "./style.css";
 
 const Login = () => {
   const { handleOnSubmit, loading } = useLogin();
   const [form] = Form.useForm();
+  const navigate = useNavigate(); // Initialize navigate
 
   const onFinish = (values) => {
     console.log("Form Submitted Data : ", values);
     handleOnSubmit(values, () => form.resetFields());
+  };
+
+  const handleForgotPassword = () => {
+    navigate("/password-reset"); // Ensure this path matches the route for RequestAction component
   };
 
   return (
@@ -58,6 +63,11 @@ const Login = () => {
             <Link className="linked" to="/register">
               Register here.
             </Link>
+          </p>
+          <p>
+            <a className="linked" onClick={handleForgotPassword}>
+              Forgot Password?
+            </a>
           </p>
         </div>
         <div className="center-button">
