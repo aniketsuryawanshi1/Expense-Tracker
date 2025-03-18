@@ -25,7 +25,7 @@ const RequestAction = () => {
       const response = await axios.post(endpoint, { email });
       if (response.status === 200) {
         message.success(isPasswordReset ? "Password reset link sent successfully" : "OTP resent successfully");
-        navigate(isPasswordReset ? "/reset-password" : "/verify-email");
+        navigate(isPasswordReset ? "/" : "/verify-email");
       }
     } catch (err) {
       message.error(err.response?.data?.message || "Failed to send request");

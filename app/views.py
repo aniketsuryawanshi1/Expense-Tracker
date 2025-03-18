@@ -146,33 +146,26 @@ class ResendOTPView(APIView):
 
 class PasswordResetRequestView(APIView):
     def post(self, request):
-
-        serializer = PasswordResetRequestSerializer(data = request.data)
-
+        serializer = PasswordResetRequestSerializer(data=request.data)
         if serializer.is_valid():
-
-            email = serializer._validated_data['email']
-
-            if User.objects.filter(email = email).exists():
-                user = User.objects.get(email = email)
+            email = serializer.validated_data['email']
+            if User.objects.filter(email=email).exists():
+                user = User.objects.get(email=email)
                 uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
                 token = PasswordResetTokenGenerator().make_token(user)
-                current_site = request.get_host()
                 relative_link = reverse(
-                    'password_reset_confirm', kwargs = {'uidb64' : uidb64, 'token' : token} 
+                    'password_reset_confirm', kwargs={'uidb64': uidb64, 'token': token}
                 )
-
-                abslink = f"http://{current_site}{relative_link}"
-
+                abslink = f"http://localhost:5173{relative_link}"
+                print("gmail link : ", abslink)
                 send_email(
                     'Password Reset Request',
                     f'Hello {user.username}, \n\nUse this link to reset your password: {abslink}. The link expires in 15 minutes.',
                     user.email
                 )
-
-                return Response({'message' : 'Password reset link sent to your email.'}, status = status.HTTP_200_OK)
-            return Response({'error' : "User with this email does not exists."}, status= status.HTTP_404_NOT_FOUND)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'Password reset link sent to your email.'}, status=status.HTTP_200_OK)
+            return Response({'error': "User with this email does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasswordResetConfirmationView(APIView):

@@ -37,7 +37,7 @@ const MainRoutes = () => {
             <Route path="/verify-email" element={<EmailVerification />} />
             <Route path="/resend-otp" element={<RequestAction />} />
             <Route path="/password-reset" element={<RequestAction />} /> 
-            <Route path="/set-new-password" element={<SetNewPassword />} />  
+            <Route path="/api/password-reset-confirm/:uidb64/:token" element={<SetNewPassword />} />  
             <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </Content>

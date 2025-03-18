@@ -2,19 +2,32 @@ import { useState } from "react";
 import { Form, message } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { InputField, CustomButton } from "../../components/index";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./test.css";
+
 const SetNewPassword = () => {
   const [loading, setLoading] = useState(false);
+  const { uidb64, token } = useParams();
+  const navigate = useNavigate();
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      // Handle password reset logic here
-      console.log("New Password:", values.password);
-      console.log("Confirm Password:", values.password2);
-      message.success("Password reset successfully!");
-    } catch {
-      message.error("Failed to reset password.");
+      console.log("url parameters : ", uidb64, token);
+      const response = await axios.post(
+        `http://localhost:8000/api/password-reset-confirm/${uidb64}/${token}/`,
+        {
+          password: values.password,
+          password2: values.password2,
+        }
+      );
+      message.success(response.data.message);
+      navigate("/login");
+    } catch (error) {
+      message.error(
+        error.response?.data?.error || "Failed to reset password."
+      );
     } finally {
       setLoading(false);
     }
