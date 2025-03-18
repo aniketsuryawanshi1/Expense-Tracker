@@ -1,11 +1,12 @@
-import { Form,Button } from "antd";
+import { Form } from "antd";
 import {
   MailOutlined,
   UserOutlined,
   LockOutlined,
   UserAddOutlined,
+  LoadingOutlined,
 } from "@ant-design/icons";
-import {   InputField } from "../../components/index";
+import { InputField, CustomButton } from "../../components/index";
 import { Link } from "react-router-dom";
 import useRegister from "../../hooks/Authentication/useRegister";
 import "./style.css";
@@ -16,9 +17,9 @@ const Register = () => {
 
   console.log("Component Rendered");
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     console.log("Form Submitted Data:", values); // ✅ Debugging
-    handleOnSubmit(values, () => form.resetFields()); // API call with form reset
+    await handleOnSubmit(values, () => form.resetFields()); // API call with form reset
   };
 
   return (
@@ -92,21 +93,15 @@ const Register = () => {
         </div>
 
         <div className="center-button">
-
-          <Button
+          <CustomButton
             type="primary"
             htmlType="submit"
-            style={{ marginTop: "20px",
-              width: "100%",
-              maxWidth: "300px",
-              padding: "20px",
-            }}
             loading={loading}
             className="custom-button"
+            icon={loading ? <LoadingOutlined /> : <UserAddOutlined />}
           >
             {loading ? "Registering..." : "Register"}
-          </Button>
-
+          </CustomButton>
         </div>
       </Form>
     </div>

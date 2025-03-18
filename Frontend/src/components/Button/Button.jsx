@@ -4,7 +4,6 @@ import "../style.css";
 import PropTypes from "prop-types";
 
 const CustomButton = ({
-  // type = "primary",
   size = "middle",
   shape = "default",
   loading: propLoading, // Accepting loading state from props
@@ -17,15 +16,16 @@ const CustomButton = ({
 }) => {
   const [loading, setLoading] = useState(false);
 
-  const handleClick = () => {
-    if (onClick) onClick();
-    setLoading(true);
-    setTimeout(() => setLoading(false), 2000); // Reset loading after 2s
+  const handleClick = async () => {
+    if (onClick) {
+      setLoading(true);
+      await onClick();
+      setLoading(false);
+    }
   };
 
   return (
     <Button
-      // type={type}
       size={size}
       shape={shape}
       loading={propLoading ?? loading} // If propLoading is passed, use it; otherwise, use state
@@ -41,7 +41,6 @@ const CustomButton = ({
 };
 
 CustomButton.propTypes = {
-  // type: PropTypes.string,
   size: PropTypes.string,
   shape: PropTypes.string,
   loading: PropTypes.bool,

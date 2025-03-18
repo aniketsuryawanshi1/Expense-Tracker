@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Card, Input, Form, Typography, Button, message } from "antd";
-import { MailOutlined } from "@ant-design/icons";
+import { Card, Input, Form, Typography, message } from "antd";
+import { MailOutlined, LoadingOutlined, CheckOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { CustomButton } from "../../components/index";
 import axios from "axios";
 
 import "../../components/style.css";
@@ -45,8 +46,7 @@ const OTPVerification = () => {
     if (e.key === "ArrowRight" && index < 3) {
       document.getElementById(`otp-${index + 1}`).focus();
     }
-  }
-
+  };
 
   useEffect(() => {
     if (otp.every((digit) => digit !== "")) {
@@ -72,7 +72,7 @@ const OTPVerification = () => {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="otp-container">
       <Card hoverable className="otp-card">
@@ -102,20 +102,17 @@ const OTPVerification = () => {
               />
             ))}
           </div>
-          <Button
+          <CustomButton
             type="primary"
             htmlType="submit"
-            style={{ marginTop: "20px",
-              width: "100%",
-              maxWidth: "300px",
-              padding: "20px",
-            }}
             loading={loading}
             className="custom-button"
+            // add some custom style
+            style={{ marginTop: "20px", width: "100%", maxWidth: "300px"}}
+            icon={loading ? <LoadingOutlined /> : <CheckOutlined />}
           >
             {loading ? "Verifying..." : "Verify"}
-          </Button>
-
+          </CustomButton>
         </Form>
       </Card>
     </div>

@@ -1,6 +1,6 @@
-import { Form,Button } from "antd";
-import { MailOutlined, LockOutlined } from "@ant-design/icons";
-import {  InputField } from "../../components/index";
+import { Form } from "antd";
+import { MailOutlined, LockOutlined, LoadingOutlined, LoginOutlined } from "@ant-design/icons";
+import { InputField, CustomButton } from "../../components/index";
 import { Link } from "react-router-dom";
 import useLogin from "../../hooks/Authentication/useLogin"; // Import the hook
 import "./style.css";
@@ -8,10 +8,12 @@ import "./style.css";
 const Login = () => {
   const { handleOnSubmit, loading } = useLogin();
   const [form] = Form.useForm();
-const onFinish = (values) => {
-  console.log("Form Submitted Data : ", values);
-  handleOnSubmit(values, () => form.resetFields());
-};
+
+  const onFinish = (values) => {
+    console.log("Form Submitted Data : ", values);
+    handleOnSubmit(values, () => form.resetFields());
+  };
+
   return (
     <div className="reg-log-container">
       <h1 className="reg-log-title">
@@ -59,19 +61,15 @@ const onFinish = (values) => {
           </p>
         </div>
         <div className="center-button">
-        <Button
+          <CustomButton
             type="primary"
             htmlType="submit"
-            style={{ marginTop: "20px",
-              width: "100%",
-              maxWidth: "300px",
-              padding: "20px",
-            }}
             loading={loading}
             className="custom-button"
+            icon={loading ? <LoadingOutlined /> : <LoginOutlined />}
           >
-            {loading ? "Loginging..." : "Login"}
-          </Button>
+            {loading ? "Logging in..." : "Login"}
+          </CustomButton>
         </div>
       </Form>
     </div>
