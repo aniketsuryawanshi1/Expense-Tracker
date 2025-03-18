@@ -1,6 +1,8 @@
+
 import { Layout, Menu, Input, Button, Switch } from "antd";
 import { SearchOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
+import logo from "../../assets/Images/expense-tracker-high-logo.svg";
 
 const { Header } = Layout;
 
@@ -23,15 +25,8 @@ const Navbar = ({ onThemeChange, theme = "light" }) => {
       }}
     >
       {/* Logo */}
-      <div
-        className="logo"
-        style={{
-          color: theme === "dark" ? "white" : "black",
-          fontSize: "20px",
-          fontWeight: "bold",
-        }}
-      >
-        MyLogo
+      <div className="logo">
+        <img src={logo} alt="Expense Tracker Logo" style={{ height: "80px", marginTop: "20px" }} />
       </div>
 
       {/* Navigation Menu */}
@@ -66,6 +61,5 @@ Navbar.propTypes = {
   onThemeChange: PropTypes.func.isRequired,
   theme: PropTypes.string,
 };
-
 
 export default Navbar;
