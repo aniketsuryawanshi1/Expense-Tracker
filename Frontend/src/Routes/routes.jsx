@@ -2,24 +2,17 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
+  
 } from "react-router-dom";
 import { Layout } from "antd";
-import { Register, Login, EmailVerification, Dashboard, RequestAction,SetNewPassword  } from "../Pages/index";
+import { Register, Login, EmailVerification, Dashboard, RequestAction,SetNewPassword, LandingPage  } from "../Pages/index";
 import { Navbar } from "../components/index";
-import { useState } from "react";
 
 
-const { Content, Footer } = Layout;
+const { Content } = Layout;
 
 const MainRoutes = () => {
-  // State to manage theme mode
-  const [theme, setTheme] = useState("light");
 
-  // Function to toggle theme
-  const handleThemeChange = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
 
   return (
     <Router>
@@ -27,11 +20,11 @@ const MainRoutes = () => {
         style={{ minHeight: "100vh", width: "100vw" }} //, overflow: "hidden"
       >
         {/* Use Navbar inside Header */}
-        <Navbar onThemeChange={handleThemeChange} theme={theme} />
-
-        <Content style={{ padding: "20px" }}>
+        
+        <Navbar />
+        <Content >
           <Routes>
-            <Route path="/" element={<Navigate to="/Login" />} />
+            <Route path="/" element={<LandingPage />} />  {/* Landing Page */}
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/verify-email" element={<EmailVerification />} />
@@ -42,9 +35,9 @@ const MainRoutes = () => {
           </Routes>
         </Content>
 
-        <Footer style={{ textAlign: "center", padding: "10px 0" }}>
+        {/* <Footer style={{ textAlign: "center", padding: "10px 0" }}>
           Footer Content
-        </Footer>
+        </Footer> */}
       </Layout>
     </Router>
   );

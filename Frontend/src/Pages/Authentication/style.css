@@ -3,6 +3,7 @@
 .reg-log-container {
   max-width: 500px;
   margin: auto;
+  margin-top: 40px;
   padding: 20px;
   border-radius: 8px;
   background: #fff;

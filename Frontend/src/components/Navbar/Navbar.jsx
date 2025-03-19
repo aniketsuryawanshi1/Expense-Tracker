@@ -1,7 +1,7 @@
+import { Layout, Menu, Button, Drawer } from "antd";
+import { useState, useEffect } from "react";
+import { MenuOutlined } from "@ant-design/icons";
 
-import { Layout, Menu, Input, Button, Switch } from "antd";
-import { SearchOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
-import PropTypes from "prop-types";
 import logo from "../../assets/Images/expense-tracker-high-logo.svg";
 
 const { Header } = Layout;
@@ -13,53 +13,78 @@ const items = [
   { key: "4", label: "Contact" },
 ];
 
-const Navbar = ({ onThemeChange, theme = "light" }) => {
+const Navbar = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const showDrawer = () => setDrawerOpen(true);
+  const closeDrawer = () => setDrawerOpen(false);
+
   return (
     <Header
       style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "0 20px",
-        background: theme === "dark" ? "#001529" : "#ffffff",
+        padding: "10px 20px",
+        background: "white",
+        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
       }}
     >
       {/* Logo */}
-      <div className="logo">
-        <img src={logo} alt="Expense Tracker Logo" style={{ height: "80px", marginTop: "20px" }} />
-      </div>
-
-      {/* Navigation Menu */}
-      <Menu
-        theme={theme}
-        mode="horizontal"
-        defaultSelectedKeys={["1"]}
-        items={items}
-        style={{ flex: 1, justifyContent: "center", background: "transparent" }}
-      />
-
-      {/* Search Bar & Theme Toggle */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <Input placeholder="Search..." style={{ width: 200 }} />
-        <Button type="primary" icon={<SearchOutlined />}>
-          Search
-        </Button>
-
-        {/* Theme Toggle Switch */}
-        <Switch
-          checked={theme === "dark"}
-          onChange={onThemeChange}
-          checkedChildren={<MoonOutlined />}
-          unCheckedChildren={<SunOutlined />}
+      <div style={{ flex: 1, marginTop: 20, textAlign : isMobile ? "center" : "left" }}>
+        <img
+          src={logo}
+          alt="Expense Tracker Logo"
+          style={{ height: isMobile ? "70px" : "80px" }}
         />
       </div>
+
+      {isMobile ? (
+        <>
+          <MenuOutlined
+            style={{ fontSize: "24px", cursor: "pointer" }}
+            onClick={showDrawer}
+          />
+          <Drawer
+            title="Menu"
+            placement="right"
+            onClose={closeDrawer}
+            open={drawerOpen}
+            width={250}
+          >
+            <Menu mode="vertical" items={items} />
+            <div style={{ marginTop: "20px", textAlign: "center" }}>
+              <Button type="primary" block>Login</Button>
+              <Button style={{ marginTop: "10px" }} block>Register</Button>
+            </div>
+          </Drawer>
+        </>
+      ) : (
+        <>
+          <Menu
+            mode="horizontal"
+            items={items}
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              background: "transparent",
+            }}
+          />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button type="primary">Login</Button>
+            <Button>Register</Button>
+          </div>
+        </>
+      )}
     </Header>
   );
-};
-
-Navbar.propTypes = {
-  onThemeChange: PropTypes.func.isRequired,
-  theme: PropTypes.string,
 };
 
 export default Navbar;
