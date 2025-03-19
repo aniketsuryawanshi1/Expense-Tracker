@@ -22,7 +22,13 @@ const MainRoutes = () => {
         {/* Use Navbar inside Header */}
         
         <Navbar />
-        <Content >
+        <Content style={
+          {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }
+        } >
           <Routes>
             <Route path="/" element={<LandingPage />} />  {/* Landing Page */}
             <Route path="/register" element={<Register />} />

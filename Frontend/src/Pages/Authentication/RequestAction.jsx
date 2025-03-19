@@ -35,9 +35,25 @@ const RequestAction = () => {
   };
 
   return (
-    <div className="resend-otp-container">
-      <Card hoverable className="resend-otp-card">
-        <MailOutlined className="resend-otp-icon" />
+    <div className="resend-otp-container" style={
+      {
+        justifyContent : 'center',
+        alignItems : 'center',
+     
+      }
+    } >
+      <Card hoverable className="resend-otp-card" style={
+        {
+          textAlign : 'center',
+        }
+      }>
+        <MailOutlined className="resend-otp-icon"
+        style={
+          {
+            fontSize: "48px",
+            
+          }
+        } />
         <Title level={3}>{isPasswordReset ? "Password Reset" : "Resend OTP"}</Title>
         <Text style={{ marginBottom: "20px", display: "block" }}>
           {isPasswordReset ? "Please enter your email to receive a password reset link" : "Please enter your email to resend the OTP"}

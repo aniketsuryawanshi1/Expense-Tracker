@@ -162,14 +162,28 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name']
 
+    def validate_name(self, value):
+        """ Ensure category name is not empty or duplicated """
+        if not value.strip():
+            raise serializers.ValidationError("Category name cannot be empty.")
+        return value
+
+
 class ExpenseSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source='category.name', read_only=True)
-    
-    
+    category_name = serializers.CharField(source='category.name', read_only=True)  # Read-only category name
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())  # Ensure category is required
+
     class Meta:
         model = Expense
         fields = ['id', 'user', 'category', 'category_name', 'amount', 'date', 'description', 'add_expense_type']
-        read_only_fields = ['user']
+        read_only_fields = ['id', 'user', 'date']  # 'user' and 'date' should not be modified by user input
+
+    def validate_amount(self, value):
+        """ Ensure amount is positive """
+        if value <= 0:
+            raise serializers.ValidationError("Amount must be greater than zero.")
+        return value
+
 
 class ExpenseTrackerSerializer(serializers.ModelSerializer):
     class Meta:

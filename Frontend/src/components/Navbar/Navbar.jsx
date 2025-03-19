@@ -1,21 +1,23 @@
 import { Layout, Menu, Button, Drawer } from "antd";
 import { useState, useEffect } from "react";
 import { MenuOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 import logo from "../../assets/Images/expense-tracker-high-logo.svg";
 
 const { Header } = Layout;
 
-const items = [
-  { key: "1", label: "Home" },
-  { key: "2", label: "About" },
-  { key: "3", label: "Services" },
-  { key: "4", label: "Contact" },
-];
-
 const Navbar = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const items = [
+    { key: "1", label: "Home", onClick: () => navigate("/") },
+    { key: "2", label: "About", onClick: () => navigate("/about") },
+    { key: "3", label: "Services", onClick: () => navigate("/services") },
+    { key: "4", label: "Contact", onClick: () => navigate("/contact") },
+  ];
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -25,6 +27,9 @@ const Navbar = () => {
 
   const showDrawer = () => setDrawerOpen(true);
   const closeDrawer = () => setDrawerOpen(false);
+
+  const handleLoginClick = () => navigate("/login");
+  const handleRegisterClick = () => navigate("/register");
 
   return (
     <Header
@@ -38,7 +43,10 @@ const Navbar = () => {
       }}
     >
       {/* Logo */}
-      <div style={{ flex: 1, marginTop: 20, textAlign : isMobile ? "center" : "left" }}>
+      <div
+        style={{ flex: 1, marginTop: 20, textAlign: isMobile ? "center" : "left", cursor: "pointer" }}
+        onClick={() => navigate("/")}
+      >
         <img
           src={logo}
           alt="Expense Tracker Logo"
@@ -61,8 +69,8 @@ const Navbar = () => {
           >
             <Menu mode="vertical" items={items} />
             <div style={{ marginTop: "20px", textAlign: "center" }}>
-              <Button type="primary" block>Login</Button>
-              <Button style={{ marginTop: "10px" }} block>Register</Button>
+              <Button type="primary" block onClick={handleLoginClick}>Login</Button>
+              <Button style={{ marginTop: "10px" }} block onClick={handleRegisterClick}>Register</Button>
             </div>
           </Drawer>
         </>
@@ -78,8 +86,8 @@ const Navbar = () => {
             }}
           />
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Button type="primary">Login</Button>
-            <Button>Register</Button>
+            <Button type="primary" onClick={handleLoginClick}>Login</Button>
+            <Button onClick={handleRegisterClick}>Register</Button>
           </div>
         </>
       )}

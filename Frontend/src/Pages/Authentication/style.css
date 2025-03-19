@@ -1,9 +1,8 @@
 /* Login Register Css */
 
 .reg-log-container {
+  width: 100%;
   max-width: 500px;
-  margin: auto;
-  margin-top: 40px;
   padding: 20px;
   border-radius: 8px;
   background: #fff;
@@ -33,6 +32,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+@media (max-width: 768px) {
+  .reg-log-container {
+    margin: 0px 10px; /* Add left-right margin on mobile */
+  }
 }
 
 /* Email Verification Css */
@@ -78,3 +83,4 @@
 .linked {
   color: #18083f;
 }
+

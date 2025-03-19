@@ -150,7 +150,7 @@ class Expense(models.Model):
     """ Model to store expenses and income """
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="expenses")
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=30, decimal_places=2)
     date = models.DateField(auto_now_add=True)
     description = models.CharField(max_length=255, null=True, blank=True)
     add_expense_type = models.CharField(max_length=10, choices=[
@@ -164,9 +164,9 @@ class Expense(models.Model):
 class ExpenseTracker(models.Model):
     """ Model to track total income and expenses per user """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="tracker")
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    total_expenses = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    total_income = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_amount = models.DecimalField(max_digits=30, decimal_places=2, default=0)
+    total_expenses = models.DecimalField(max_digits=30, decimal_places=2, default=0)
+    total_income = models.DecimalField(max_digits=30, decimal_places=2, default=0)
 
     def update_totals(self):
         """ Update total income, expenses, and balance automatically """
