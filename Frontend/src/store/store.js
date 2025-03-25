@@ -1,6 +1,8 @@
 import { configstore } from "@reduxjs/toolkit";
 
 const store = configstore({
-  reducer: {},
+  reducer: {
+    
+  },
 });
 export default store;

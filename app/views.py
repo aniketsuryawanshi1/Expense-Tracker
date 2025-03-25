@@ -352,6 +352,4 @@ class ExpenseReportAPIView(APIView):
         response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response["Content-Disposition"] = f'attachment; filename="Expense_Report_{year}{"_" + str(month) if report_type == "monthly" else ""}.xlsx"'
         df.to_excel(response, index=False)
-        # Save that generated excel file.
-         
         return response
