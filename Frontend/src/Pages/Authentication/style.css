@@ -34,11 +34,11 @@
   align-items: center;
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .reg-log-container {
-    margin: 0px 10px; /* Add left-right margin on mobile */
+    margin: 0px 10px; /
   }
-}
+} */
 
 /* Email Verification Css */
 
@@ -63,7 +63,6 @@
   margin-bottom: 10px;
 }
 
-
 /* Style.css Changes */
 .otp-input .ant-input {
   height: 60px; /* Increased height for bigger boxes */
@@ -83,4 +82,3 @@
 .linked {
   color: #18083f;
 }
-

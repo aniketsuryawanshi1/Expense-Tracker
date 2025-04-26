@@ -80,7 +80,7 @@ const InputField = (props) => {
         <Input.TextArea
           placeholder={placeholder}
           className={`custom-textarea ${className}`}
-          size="small"
+          size="large"
           value={inputValue}
           onChange={handleChange}
           {...restProps}
@@ -91,7 +91,7 @@ const InputField = (props) => {
           placeholder={placeholder}
           prefix={prefixIcon}
           className={`custom-input-field ${className}`}
-          size="small"
+          size="large"
           value={inputValue}
           onChange={handleChange}
           {...restProps}

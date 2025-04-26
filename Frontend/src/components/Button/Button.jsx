@@ -12,7 +12,7 @@ const CustomButton = ({
   className = "",
   icon = null,
   children,
-  ...rest
+  ...rest // Other props to pass to the button dynamically.
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -35,7 +35,7 @@ const CustomButton = ({
       icon={icon}
       {...rest}
     >
-      {loading ? "Loading..." : children}
+      {loading ? "Loading..." : children} {/* Show loading text if loading.*/}
     </Button>
   );
 };

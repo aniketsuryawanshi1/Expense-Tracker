@@ -31,7 +31,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
-      - "3307:3306" # Expose MySQL port
+      - "3306:3306" # Expose MySQL port
 
 networks:
   expense_network:

@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import { Layout, Menu, Button, Drawer } from "antd";
 import {
+  HomeOutlined,
+  FileTextOutlined,
+  PlusCircleOutlined,
+  LogoutOutlined,
+  AppstoreAddOutlined,
+  MenuOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
-  UploadOutlined,
-  MenuOutlined,
 } from "@ant-design/icons";
+import useLogout from "../../hooks/Authentication/useLogout";
 import { useNavigate } from "react-router-dom";
 
 const { Sider } = Layout;
@@ -18,6 +21,8 @@ const SideNav = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
 
+  const handelLogout = useLogout();
+
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
@@ -27,21 +32,33 @@ const SideNav = () => {
   const menuItems = [
     {
       key: "1",
-      icon: <UserOutlined />,
-      label: "Profile",
-      onClick: () => navigate("/profile"),
-    },
-    {
-      key: "2",
-      icon: <VideoCameraOutlined />,
+      icon: <HomeOutlined />,
       label: "Dashboard",
       onClick: () => navigate("/dashboard"),
     },
     {
+      key: "2",
+      icon: <FileTextOutlined />,
+      label: "Generate Report",
+      onClick: () => navigate("/generatereport"),
+    },
+    {
       key: "3",
-      icon: <UploadOutlined />,
-      label: "Uploads",
-      onClick: () => navigate("/uploads"),
+      icon: <PlusCircleOutlined />,
+      label: "Add New",
+      onClick: () => navigate("/addnew"),
+    },
+    {
+      key: "4",
+      icon: <AppstoreAddOutlined />,
+      label: "Add Category",
+      onClick: () => navigate("/addcategory"),
+    },
+    {
+      key: "5",
+      icon: <LogoutOutlined />,
+      label: "Logout",
+      onClick: () => handelLogout(),
     },
   ];
 

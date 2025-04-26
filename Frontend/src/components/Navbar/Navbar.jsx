@@ -2,8 +2,9 @@ import { Layout, Menu, Button, Drawer } from "antd";
 import { useState, useEffect } from "react";
 import { MenuOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-
+import { useAuth } from "../../context/AuthContext";
 import logo from "../../assets/Images/expense-tracker-high-logo.svg";
+import { ProfileDropdown } from "../index";
 
 const { Header } = Layout;
 
@@ -11,6 +12,7 @@ const Navbar = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   const items = [
     { key: "1", label: "Home", onClick: () => navigate("/") },
@@ -44,7 +46,12 @@ const Navbar = () => {
     >
       {/* Logo */}
       <div
-        style={{ flex: 1, marginTop: 20, textAlign: isMobile ? "center" : "left", cursor: "pointer" }}
+        style={{
+          flex: 1,
+          marginTop: 20,
+          textAlign: isMobile ? "center" : "left",
+          cursor: "pointer",
+        }}
         onClick={() => navigate("/")}
       >
         <img
@@ -54,6 +61,7 @@ const Navbar = () => {
         />
       </div>
 
+      {/* Menu + Buttons / ProfileDropdown */}
       {isMobile ? (
         <>
           <MenuOutlined
@@ -67,28 +75,56 @@ const Navbar = () => {
             open={drawerOpen}
             width={250}
           >
-            <Menu mode="vertical" items={items} />
-            <div style={{ marginTop: "20px", textAlign: "center" }}>
-              <Button type="primary" block onClick={handleLoginClick}>Login</Button>
-              <Button style={{ marginTop: "10px" }} block onClick={handleRegisterClick}>Register</Button>
-            </div>
+            {!token ? (
+              <>
+                <Menu
+                  mode="vertical"
+                  items={items}
+                  onClick={closeDrawer} // close drawer on click
+                />
+                <div style={{ marginTop: "20px", textAlign: "center" }}>
+                  <Button type="primary" block onClick={handleLoginClick}>
+                    Login
+                  </Button>
+                  <Button
+                    style={{ marginTop: "10px" }}
+                    block
+                    onClick={handleRegisterClick}
+                  >
+                    Register
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <ProfileDropdown />
+            )}
           </Drawer>
         </>
       ) : (
         <>
-          <Menu
-            mode="horizontal"
-            items={items}
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              background: "transparent",
-            }}
-          />
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Button type="primary" onClick={handleLoginClick}>Login</Button>
-            <Button onClick={handleRegisterClick}>Register</Button>
-          </div>
+          {!token ? (
+            <>
+              <Menu
+                mode="horizontal"
+                items={items}
+                style={{
+                  flex: 1,
+                  background: "transparent",
+                  justifyContent: "center",
+                }}
+              />
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                <Button type="primary" onClick={handleLoginClick}>
+                  Login
+                </Button>
+                <Button onClick={handleRegisterClick}>Register</Button>
+              </div>
+            </>
+          ) : (
+            <ProfileDropdown />
+          )}
         </>
       )}
     </Header>
