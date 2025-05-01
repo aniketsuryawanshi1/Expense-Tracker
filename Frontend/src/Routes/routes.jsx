@@ -8,9 +8,15 @@ import {
   RequestAction,
   SetNewPassword,
   LandingPage,
+  GenerateReport,
+  AddNew,
+  AddCategory,
 } from "../Pages/index";
+
 import { Navbar, SideNav } from "../components/index";
 import { useAuth } from "../context/AuthContext";
+import PrivateRoute from "./ProtectedRoute";
+import PublicRoutes from "./PublicRoutes";
 const { Content } = Layout;
 
 const MainRoutes = () => {
@@ -32,18 +38,95 @@ const MainRoutes = () => {
             }}
           >
             <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/verify-email" element={<EmailVerification />} />
-              <Route path="/resend-otp" element={<RequestAction />} />
-              <Route path="/password-reset" element={<RequestAction />} />
+              <Route
+                path="/"
+                element={
+                  <PublicRoutes>
+                    <LandingPage />
+                  </PublicRoutes>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <PublicRoutes>
+                    <Register />
+                  </PublicRoutes>
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  <PublicRoutes>
+                    <Login />
+                  </PublicRoutes>
+                }
+              />
+              <Route
+                path="/verify-email"
+                element={
+                  <PublicRoutes>
+                    <EmailVerification />
+                  </PublicRoutes>
+                }
+              />
+              <Route
+                path="/resend-otp"
+                element={
+                  <PublicRoutes>
+                    <EmailVerification />
+                  </PublicRoutes>
+                }
+              />
+              <Route
+                path="/password-reset"
+                element={
+                  <PublicRoutes>
+                    <RequestAction />
+                  </PublicRoutes>
+                }
+              />
               <Route
                 path="/api/password-reset-confirm/:uidb64/:token"
-                element={<SetNewPassword />}
+                element={
+                  <PublicRoutes>
+                    <SetNewPassword />
+                  </PublicRoutes>
+                }
               />
 
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    <Dashboard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/generatereport"
+                element={
+                  <PrivateRoute>
+                    <GenerateReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/addnew"
+                element={
+                  <PrivateRoute>
+                    <AddNew />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/addcategory"
+                element={
+                  <PrivateRoute>
+                    <AddCategory />
+                  </PrivateRoute>
+                }
+              />
             </Routes>
           </Content>
         </Layout>

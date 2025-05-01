@@ -24,7 +24,11 @@ const RequestAction = () => {
         : "http://localhost:8000/api/otp/resend/";
       const response = await axios.post(endpoint, { email });
       if (response.status === 200) {
-        message.success(isPasswordReset ? "Password reset link sent successfully" : "OTP resent successfully");
+        message.success(
+          isPasswordReset
+            ? "Password reset link sent successfully"
+            : "OTP resent successfully"
+        );
         navigate(isPasswordReset ? "/" : "/verify-email");
       }
     } catch (err) {
@@ -35,28 +39,33 @@ const RequestAction = () => {
   };
 
   return (
-    <div className="resend-otp-container" style={
-      {
-        justifyContent : 'center',
-        alignItems : 'center',
-     
-      }
-    } >
-      <Card hoverable className="resend-otp-card" style={
-        {
-          textAlign : 'center',
-        }
-      }>
-        <MailOutlined className="resend-otp-icon"
-        style={
-          {
+    <div
+      className="resend-otp-container"
+      style={{
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Card
+        hoverable
+        className="resend-otp-card"
+        style={{
+          textAlign: "center",
+        }}
+      >
+        <MailOutlined
+          className="resend-otp-icon"
+          style={{
             fontSize: "48px",
-            
-          }
-        } />
-        <Title level={3}>{isPasswordReset ? "Password Reset" : "Resend OTP"}</Title>
+          }}
+        />
+        <Title level={3}>
+          {isPasswordReset ? "Password Reset" : "Resend OTP"}
+        </Title>
         <Text style={{ marginBottom: "20px", display: "block" }}>
-          {isPasswordReset ? "Please enter your email to receive a password reset link" : "Please enter your email to resend the OTP"}
+          {isPasswordReset
+            ? "Please enter your email to receive a password reset link"
+            : "Please enter your email to resend the OTP"}
         </Text>
 
         <Form onFinish={handleSubmit}>
@@ -69,6 +78,7 @@ const RequestAction = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
+              size="large"
               style={{ width: "100%", maxWidth: "300px" }}
             />
           </Form.Item>
@@ -79,7 +89,11 @@ const RequestAction = () => {
             className="custom-button"
             style={{ width: "100%", maxWidth: "300px" }}
           >
-            {loading ? "Sending..." : isPasswordReset ? "Send Reset Link" : "Send OTP"}
+            {loading
+              ? "Sending..."
+              : isPasswordReset
+              ? "Send Reset Link"
+              : "Send OTP"}
           </CustomButton>
         </Form>
       </Card>

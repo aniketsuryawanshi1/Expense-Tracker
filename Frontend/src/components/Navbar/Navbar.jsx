@@ -4,7 +4,7 @@ import { MenuOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import logo from "../../assets/Images/expense-tracker-high-logo.svg";
-import { ProfileDropdown } from "../index";
+import { ProfileInfo } from "../index";
 
 const { Header } = Layout;
 
@@ -96,7 +96,7 @@ const Navbar = () => {
                 </div>
               </>
             ) : (
-              <ProfileDropdown />
+              <ProfileInfo />
             )}
           </Drawer>
         </>
@@ -123,7 +123,7 @@ const Navbar = () => {
               </div>
             </>
           ) : (
-            <ProfileDropdown />
+            <ProfileInfo />
           )}
         </>
       )}
