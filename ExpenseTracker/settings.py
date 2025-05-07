@@ -55,7 +55,6 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(",")
 
 
 AUTH_USER_MODEL='app.User'
